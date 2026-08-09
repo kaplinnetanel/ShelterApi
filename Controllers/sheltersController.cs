@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ShelterApi.DTO;
 using ShelterApi.Repositories;
 using System.Diagnostics.Contracts;
@@ -33,7 +34,30 @@ public class sheltersController : ControllerBase
         var respons = await _conect.GetSorted(sortBy, ascending);
         return Ok(respons);
     }
+    [HttpGet("inspections/detailed")]
+    public async Task<ActionResult<IEnumerable<InspectionsDetailedDto>>> Getinspections()
+    {
+        var respons = await _conect.Getinspections();
+        return Ok(respons);
+    }
+    [HttpGet("with-inspection-count")]
+    public async Task<ActionResult<IEnumerable<WithInspectionCountDTO>>>GetwithInspectionCount()
+    {
+        var respons = await _conect.GetwithInspectionCount();
+        return Ok(respons);
 
-
+    }
+    [HttpGet("inspections/failed")]
+    public async Task<ActionResult<IEnumerable<DtoInspectionsFailed>>> GetInspectionsFailed()
+    {
+        var respons = await _conect.GetInspectionsFailed();
+        return Ok(respons);
+    }
+    [HttpGet("statistics")]
+    public async Task<ActionResult<IEnumerable<AreaStatisticsDto>>> GetAreasStatistics()
+    {
+        var statistics = await _conect.GetAreasStatistics();
+        return Ok(statistics);
+    }
 
 }
