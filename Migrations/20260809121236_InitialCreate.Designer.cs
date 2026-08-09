@@ -12,7 +12,7 @@ using ShelterApi.date;
 namespace ShelterApi.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260809092536_InitialCreate")]
+    [Migration("20260809121236_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -99,7 +99,7 @@ namespace ShelterApi.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AreaCode")
+                    b.Property<int>("AreaId")
                         .HasColumnType("int");
 
                     b.Property<string>("BuildingNumber")
@@ -125,14 +125,14 @@ namespace ShelterApi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Streer")
+                    b.Property<string>("Street")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AreaCode");
+                    b.HasIndex("AreaId");
 
                     b.ToTable("Shelters");
                 });
@@ -152,7 +152,7 @@ namespace ShelterApi.Migrations
                 {
                     b.HasOne("ShelterApi.Models.Area", "Area")
                         .WithMany("Shelters")
-                        .HasForeignKey("AreaCode")
+                        .HasForeignKey("AreaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 

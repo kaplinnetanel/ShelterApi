@@ -43,7 +43,7 @@ namespace ShelterApi.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Name = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Streer = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    Street = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BuildingNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -52,14 +52,14 @@ namespace ShelterApi.Migrations
                     IsPublic = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ShelterType = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AreaCode = table.Column<int>(type: "int", nullable: false)
+                    AreaId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Shelters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Shelters_Areas_AreaCode",
-                        column: x => x.AreaCode,
+                        name: "FK_Shelters_Areas_AreaId",
+                        column: x => x.AreaId,
                         principalTable: "Areas",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -98,9 +98,9 @@ namespace ShelterApi.Migrations
                 column: "ShelterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shelters_AreaCode",
+                name: "IX_Shelters_AreaId",
                 table: "Shelters",
-                column: "AreaCode");
+                column: "AreaId");
         }
 
         /// <inheritdoc />
