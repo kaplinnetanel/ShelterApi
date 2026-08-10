@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ShelterApi.DTO;
+using ShelterApi.Models;
 using ShelterApi.Repositories;
 using System.Diagnostics.Contracts;
 
@@ -14,6 +15,49 @@ public class sheltersController : ControllerBase
     public sheltersController(IMyRepository MyRepository)
     {
         _conect = MyRepository;
+    }
+    [HttpGet("{id}")]
+    public async Task<ActionResult<Shelter?>> GetById(int id)
+    {
+        var respons = await _conect.GetById(id);
+        if (respons == null)
+        {
+            return NotFound();
+        }
+        return Ok(respons);
+
+    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeletShelter(int id)
+    {
+        var respons = await _conect.DeletShelter(id);
+        if(respons == false)
+        {
+            return  NotFound();
+
+        }
+        return NoContent();
+
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateShelterAsync(Shelter shelter)
+    {
+        var r = _conect.CreateShelterAsync(shelter);
+        if(r == null)
+        {
+            return NotFound();
+        }
+        return NoContent();
+    }
+    [HttpPut]
+    public async Task<IActionResult>UpdateShelter(int id,ShelterDto shelter)
+    {
+        var r = await _conect.UpdateShelterAsync(id,shelter);
+        if (r == false)
+        {
+            return NotFound();
+        }
+        return CreatedAtAction(nameof(GetById), new { id = shelter.Name }, shelter);
     }
     [HttpGet("/with-area")]
 
@@ -58,6 +102,12 @@ public class sheltersController : ControllerBase
     {
         var statistics = await _conect.GetAreasStatistics();
         return Ok(statistics);
+    }
+    [HttpGet("average-score-by-type")]
+    public async Task<ActionResult<IEnumerable<AverageScoreByTypeDto>>> GetaverageScoreByType()
+    {
+        var respons = await _conect.GetaverageScoreByType();
+        return Ok(respons);
     }
 
 }

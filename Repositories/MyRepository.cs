@@ -5,6 +5,7 @@ using ShelterApi.DTO;
 using ShelterApi.Models;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ShelterApi.Repositories;
 
@@ -16,6 +17,53 @@ public class MyRepository : IMyRepository
     {
         _context = context;
     }
+    public async Task<Shelter?> GetById(int id)
+    {
+        return await _context.Shelters.FirstOrDefaultAsync(p => p.Id == id);
+    }
+    public async Task<bool> DeletShelter(int id)
+
+    {
+        var d = await _context.Shelters.FindAsync(id);
+        if (d == null )
+        {
+            return false;
+        }
+        _context.Shelters.Remove(d);
+        return true;
+    }
+    public async Task<int?> CreateShelterAsync(Shelter shelter)
+    {
+        if (shelter.IsPublic == true)
+        {
+            return null;
+        }
+        await _context.Shelters.AddAsync(shelter);
+        await _context.SaveChangesAsync();
+        return shelter.Id;
+    }
+    public async Task<bool> UpdateShelterAsync(int id, ShelterDto updatedShelter)
+    {
+        var shelter = await _context.Shelters.FirstOrDefaultAsync(p=> p.Id==id);
+        if (shelter == null)
+        {
+            return false;
+        }
+        shelter.Name = updatedShelter.Name;
+        shelter.Street = updatedShelter.Street;
+        shelter.BuildingNumber = updatedShelter.BuildingNumber;
+        shelter.Capacity = updatedShelter.Capacity;
+        shelter.IsAccessible = updatedShelter.IsAccessible;
+        shelter.IsPublic = updatedShelter.IsPublic;
+        shelter.ShelterType = updatedShelter.ShelterType;
+        shelter.AreaId = updatedShelter.AreaId;
+        await _context.SaveChangesAsync();
+
+        return true;
+    }
+
+
+
     public async Task<IEnumerable<DtoAllSheltersWithArea>> GetAllSheltersWithAreAsync()
     {
         return await _context.Shelters.Select(
@@ -168,4 +216,51 @@ public class MyRepository : IMyRepository
         })
         .ToListAsync();
     }
+    public async Task<IEnumerable<AverageScoreByTypeDto>> GetaverageScoreByType()
+    {
+        return await _context.Shelters.Select(p => new AverageScoreByTypeDto
+        {
+            shelterType = p.ShelterType,
+            averageReadinessScore =_context.Shelters.Where(s=> s.ShelterType == p.ShelterType).Average(s=> (double)s.Area.RiskLevel),
+            totalInspections = _context.Shelters.Where(s => s.ShelterType == p.ShelterType).Count()
+
+        }).Distinct().ToListAsync();
+
+    }
+    public async Task<ShelterPagedResponseDto> GetPagedShelters(int page = 1, int pageSize = 10)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 1;
+        if (pageSize > 50) pageSize = 50;
+
+        int totalCount = await _context.Shelters.CountAsync();
+        var items = await _context.Shelters
+        .OrderBy(s => s.Name)
+        .Skip((page - 1) * pageSize)
+        .Take(pageSize)
+        .Select(s => new Shelter
+        {
+            Id = s.Id,
+            Name = s.Name,
+            Capacity = s.Capacity
+        })
+        .ToListAsync();
+
+    return new ShelterPagedResponseDto
+    {
+        Items = items,
+        TotalCount = totalCount,
+        Page = page,
+        PageSize = pageSize,
+        TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+    };
+}
+
+ 
+
+
+
+
+
+
 }
